@@ -51,6 +51,24 @@ PREDICTION=""
 ACTUAL_MOVE=""
 
 if [ -f "$PREDICTION_FILE" ]; then
+    # --- GUARD: never score the same date twice ---
+    # The scoreboard is append-only. Without this, a re-run (manual, retry, or
+    # a cron firing twice due to a timezone change) adds a duplicate row and
+    # inflates the win/loss record. Bug caught 2026-07-26.
+    if [ -f "$SCOREBOARD_CSV" ] && grep -q "^${TODAY}," "$SCOREBOARD_CSV" 2>/dev/null; then
+        echo "===SNAPSHOT==="
+        echo "PRICE: $PRICE"
+        echo "DATE: $TODAY"
+        echo "EVAL: ALREADY_SCORED"
+        echo "TIME: ${LOCAL_TIME}"
+        echo "NOTE: ${TODAY} already scored — scoreboard left untouched."
+        cd "$REPO_DIR"
+        git add "$PRICES_CSV" "$LAST_PRICE" 2>/dev/null || true
+        git commit -m "📊 BTC price log ${TODAY}: \$${PRICE} @ ${LOCAL_TIME} (already scored)" 2>&1 || true
+        git push origin main 2>&1 || git push origin master 2>&1 || true
+        exit 0
+    fi
+
     PREDICTION=$(python3 -c "import json; d=json.load(open('$PREDICTION_FILE')); print(d.get('prediction',''))" 2>/dev/null || echo "")
     PREDICTION_TS=$(python3 -c "import json; d=json.load(open('$PREDICTION_FILE')); print(d.get('prediction_submitted_at_utc', d.get('timestamp','')))" 2>/dev/null || echo "")
     # Use the price captured at prediction time — NOT yesterday's price
