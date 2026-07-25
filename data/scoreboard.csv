@@ -1,1 +1,2 @@
 date,predicted,actual,correct,prediction_time_utc,prediction_price_usd,snapshot_price_usd
+2026-07-25,higher,higher,true,2026-07-25T06:50:00+00:00,63920.00,64312.00
