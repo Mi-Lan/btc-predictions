@@ -8,6 +8,7 @@ Usage: python3 save_prediction.py <higher|lower>
 import json
 import sys
 import subprocess
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -32,28 +33,38 @@ def main():
 
     # Read existing file if it exists (preserve morning timestamp)
     morning_ts = now_utc
-    morning_ref = "N/A"
     if PREDICTION_FILE.exists():
         try:
             existing = json.loads(PREDICTION_FILE.read_text())
             morning_ts = existing.get("timestamp", now_utc)
-            morning_ref = existing.get("morning_price_reference", "N/A")
         except Exception:
             pass
+
+    # Fetch the live BTC price at the moment of prediction — this is the reference price
+    prediction_price = "N/A"
+    try:
+        url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"
+        req = urllib.request.Request(url, headers={"User-Agent": "hermes-btc-bot"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            import json as _json
+            data_raw = _json.loads(resp.read())
+            prediction_price = f"{data_raw['bitcoin']['usd']:.2f}"
+    except Exception as e:
+        print(f"WARNING: Could not fetch live BTC price: {e}")
 
     data = {
         "date": today,
         "prediction": prediction,
         "timestamp": morning_ts,
         "prediction_submitted_at_utc": now_utc,
-        "morning_price_reference": morning_ref,
+        "prediction_price_usd": prediction_price,
     }
 
     PREDICTION_FILE.write_text(json.dumps(data, indent=2) + "\n")
 
     # Commit and push
     subprocess.run(["git", "add", str(PREDICTION_FILE)], cwd=REPO_DIR, check=True)
-    commit_msg = f"🎯 Prediction {today}: {prediction.upper()} (submitted {now_utc})"
+    commit_msg = f"🎯 Prediction {today}: {prediction.upper()} @ ${prediction_price} (submitted {now_utc})"
     subprocess.run(["git", "commit", "-m", commit_msg], cwd=REPO_DIR, check=True)
 
     # Try pushing

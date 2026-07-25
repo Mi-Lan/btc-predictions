@@ -52,20 +52,12 @@ ACTUAL_MOVE=""
 
 if [ -f "$PREDICTION_FILE" ]; then
     PREDICTION=$(python3 -c "import json; d=json.load(open('$PREDICTION_FILE')); print(d.get('prediction',''))" 2>/dev/null || echo "")
-    PREDICTION_TS=$(python3 -c "import json; d=json.load(open('$PREDICTION_FILE')); print(d.get('timestamp',''))" 2>/dev/null || echo "")
-    PREV_PRICE=$(python3 -c "
-import csv
-rows = list(csv.reader(open('$PRICES_CSV')))
-if len(rows) > 2:
-    print(rows[-2][1])
-elif len(rows) > 1:
-    print(rows[-1][1])
-else:
-    print('0')
-" 2>/dev/null || echo "0")
+    PREDICTION_TS=$(python3 -c "import json; d=json.load(open('$PREDICTION_FILE')); print(d.get('prediction_submitted_at_utc', d.get('timestamp','')))" 2>/dev/null || echo "")
+    # Use the price captured at prediction time — NOT yesterday's price
+    PRED_PRICE=$(python3 -c "import json; d=json.load(open('$PREDICTION_FILE')); print(d.get('prediction_price_usd',''))" 2>/dev/null || echo "")
 
-    if [ -n "$PREDICTION" ] && [ "$PREV_PRICE" != "0" ] && [ -n "$PREV_PRICE" ]; then
-        ACTUAL_MOVE=$(python3 -c "print('higher' if float('$PRICE') > float('$PREV_PRICE') else 'lower')")
+    if [ -n "$PREDICTION" ] && [ -n "$PRED_PRICE" ] && [ "$PRED_PRICE" != "N/A" ] && [ "$PRED_PRICE" != "" ]; then
+        ACTUAL_MOVE=$(python3 -c "print('higher' if float('$PRICE') > float('$PRED_PRICE') else 'lower')")
         CORRECT="false"
         if [ "$PREDICTION" = "$ACTUAL_MOVE" ]; then
             CORRECT="true"
@@ -74,9 +66,9 @@ else:
 
         # Append to scoreboard
         if [ ! -f "$SCOREBOARD_CSV" ]; then
-            echo "date,predicted,actual,correct,prediction_time_utc,price_snapshot_usd" > "$SCOREBOARD_CSV"
+            echo "date,predicted,actual,correct,prediction_time_utc,prediction_price_usd,snapshot_price_usd" > "$SCOREBOARD_CSV"
         fi
-        echo "${TODAY},${PREDICTION},${ACTUAL_MOVE},${CORRECT},${PREDICTION_TS},${PRICE}" >> "$SCOREBOARD_CSV"
+        echo "${TODAY},${PREDICTION},${ACTUAL_MOVE},${CORRECT},${PREDICTION_TS},${PRED_PRICE},${PRICE}" >> "$SCOREBOARD_CSV"
 
         # Calculate win rate
         WIN_RATE=$(python3 -c "
@@ -87,10 +79,10 @@ total = len(rows)
 print(f'{wins}/{total}' if total > 0 else '0/0')
 " 2>/dev/null || echo "0/0")
 
-        echo "PREDICTION_EVALUATED: predicted=${PREDICTION}, actual=${ACTUAL_MOVE}, correct=${CORRECT}, record=${WIN_RATE}"
+        echo "PREDICTION_EVALUATED: predicted=${PREDICTION}, prediction_price=${PRED_PRICE}, snapshot_price=${PRICE}, actual=${ACTUAL_MOVE}, correct=${CORRECT}, record=${WIN_RATE}"
     else
-        EVAL_RESULT="NO_PREV_PRICE"
-        echo "WARNING: Could not compare — no previous price found"
+        EVAL_RESULT="NO_PREDICTION_PRICE"
+        echo "WARNING: Could not compare — no prediction price found in prediction file"
     fi
 else
     echo "INFO: No prediction file found for today — logging price only"

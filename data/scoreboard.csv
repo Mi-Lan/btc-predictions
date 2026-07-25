@@ -1,1 +1,1 @@
-date,predicted,actual,correct,prediction_time_utc,price_snapshot_usd
+date,predicted,actual,correct,prediction_time_utc,prediction_price_usd,snapshot_price_usd
