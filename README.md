@@ -8,16 +8,18 @@ Automated Bitcoin price tracking and prediction game. Every day:
 
 ## Current Score
 
-| Date | Predicted | Actual | Correct | Price (UTC) |
-|------|-----------|--------|---------|-------------|
+**Record: 2-0** | **Win Rate: 100%**
 
-*(Populated automatically — see `data/scoreboard.csv` for raw data)*
+| Date | Predicted | Actual | Correct | Snapshot Price |
+|------|-----------|--------|---------|-----------------|
+| 2026-07-25 | HIGHER | HIGHER | ✅ | $64,312.00 |
+| 2026-07-26 | HIGHER | HIGHER | ✅ | $64,783.00 |
 
 ## How It Works
 
 - **Prediction**: Reply "higher" or "lower" to the 10 AM Telegram reminder
 - **Price source**: CoinGecko API (real-time BTC/USD)
-- **Comparison**: Today's 23:11 price vs yesterday's 23:11 price
+- **Comparison**: Today's prediction price vs tonight's 23:11 snapshot price
 - **Scoring**: Your prediction is marked correct if it matches the actual price movement
 
 ## Files
