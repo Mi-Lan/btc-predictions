@@ -2,7 +2,7 @@
 
 Automated Bitcoin price tracking and prediction game. Every day:
 
-1. **10:00 AM** — Morning reminder: predict if BTC will be **higher** or **lower** by 23:11
+1. **10:00 AM** — Morning reminder: tap ☀️ Sun (higher) or 🌙 Moon (lower)
 2. **23:11** — Bitcoin price is fetched, logged, and your prediction is evaluated
 3. **Scoreboard updated** — win/loss record committed to this repo
 
@@ -30,6 +30,7 @@ Automated Bitcoin price tracking and prediction game. Every day:
 - `data/last_price.txt` — Most recent BTC price
 - `scripts/snapshot.sh` — Price fetch + evaluation engine
 - `scripts/morning_predict_reminder.sh` — Morning reminder trigger
+- `scripts/regen_readme.sh` — README scoreboard regenerator
 - `scripts/save_prediction.py` — Saves your prediction to repo
 
 ---

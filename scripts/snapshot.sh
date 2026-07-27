@@ -63,7 +63,9 @@ if [ -f "$PREDICTION_FILE" ]; then
         echo "TIME: ${LOCAL_TIME}"
         echo "NOTE: ${TODAY} already scored — scoreboard left untouched."
         cd "$REPO_DIR"
-        git add "$PRICES_CSV" "$LAST_PRICE" 2>/dev/null || true
+        # Regenerate README even on re-runs so it never falls behind the scoreboard
+        bash "$REPO_DIR/scripts/regen_readme.sh" 2>/dev/null || true
+        git add "$PRICES_CSV" "$LAST_PRICE" README.md 2>/dev/null || true
         git commit -m "📊 BTC price log ${TODAY}: \$${PRICE} @ ${LOCAL_TIME} (already scored)" 2>&1 || true
         git push origin main 2>&1 || git push origin master 2>&1 || true
         exit 0
@@ -106,9 +108,12 @@ else
     echo "INFO: No prediction file found for today — logging price only"
 fi
 
+# --- Regenerate README scoreboard table from CSV (shared script) ---
+bash "$REPO_DIR/scripts/regen_readme.sh" 2>&1 || true
+
 # --- Commit to GitHub ---
 cd "$REPO_DIR"
-git add "$PRICES_CSV" "$LAST_PRICE" "$SCOREBOARD_CSV" 2>/dev/null || true
+git add "$PRICES_CSV" "$LAST_PRICE" "$SCOREBOARD_CSV" README.md 2>/dev/null || true
 git commit -m "📊 BTC Price Snapshot ${TODAY}: \$${PRICE} @ ${LOCAL_TIME}
 
 Predicted: ${PREDICTION:-N/A}
