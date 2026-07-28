@@ -8,13 +8,14 @@ Automated Bitcoin price tracking and prediction game. Every day:
 
 ## Current Score
 
-**Record: 3-0** | **Win Rate: 100%**
+**Record: 3-1** | **Win Rate: 75%**
 
 | Date | Predicted | Actual | Correct | Snapshot Price |
 |------|-----------|--------|---------|-----------------|
 | 2026-07-25 | HIGHER | HIGHER | ✅ | $64,312.00 |
 | 2026-07-26 | HIGHER | HIGHER | ✅ | $64,783.00 |
 | 2026-07-27 | LOWER | LOWER | ✅ | $64,783.00 |
+| 2026-07-28 | LOWER | HIGHER | ❌ | $63,818.00 |
 ## How It Works
 
 - **Prediction**: Tap ☀️ Sun (higher) or 🌙 Moon (lower) on the 10 AM Telegram reminder
