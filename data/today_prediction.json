@@ -1,6 +1,7 @@
 {
   "date": "2026-07-30",
-  "prediction": "",
+  "prediction": "higher",
   "timestamp": "2026-07-30T06:20:58+00:00",
-  "morning_price_reference": "63818"
+  "prediction_submitted_at_utc": "2026-07-30T06:21:26+00:00",
+  "prediction_price_usd": "63920.00"
 }
