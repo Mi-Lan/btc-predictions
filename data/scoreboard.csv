@@ -5,3 +5,4 @@ date,predicted,actual,correct,prediction_time_utc,prediction_price_usd,snapshot_
 2026-07-28,lower,higher,false,2026-07-28T06:52:12+00:00,63489.00,63818.00
 2026-07-30,higher,higher,true,2026-07-30T06:21:26+00:00,63920.00,64734.00
 2026-07-31,higher,lower,false,2026-07-31T05:46:18+00:00,64280.00,62923.00
+2026-08-01,lower,lower,true,2026-08-01T06:42:59+00:00,63011.00,62718.00
